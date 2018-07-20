@@ -21,10 +21,12 @@ package com.tasktop.koans.java8.test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Clock;
+import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.OffsetDateTime;
 import java.time.Period;
 import java.time.ZoneId;
@@ -60,7 +62,7 @@ public class AboutDateTimeAPI {
 	public void java8_datesAreImmutable() {
 		LocalDateTime date = LocalDateTime.now();
 		Duration durationtoAdd = Duration.of(1, ChronoUnit.HOURS);
-		LocalDateTime date2 = date; // FIXME: See if you can find a way to add the durationToAdd to the date
+		LocalDateTime date2 = date.plus(durationtoAdd); // FIXED: See if you can find a way to add the durationToAdd to the date
 
 		assertThat(date).isNotSameAs(date2);
 	}
@@ -78,7 +80,7 @@ public class AboutDateTimeAPI {
 	public void java8_timeInMiliSeconds() {
 		Instant now = Instant.now();
 
-		long timeInMilis = -1; // FIXME: checkout if you can find the method on "now" that returns the milis
+		long timeInMilis = now.toEpochMilli(); // FIXED: checkout if you can find the method on "now" that returns the milis
 
 		assertThat(timeInMilis).isGreaterThan(0);
 	}
@@ -92,7 +94,7 @@ public class AboutDateTimeAPI {
 
 	@Test
 	public void java8_getNow() {
-		LocalDate now = null; // FIXME: maybe there is a factory method on LocalDate you can use to get now
+		LocalDate now = LocalDate.now(); // FIXED: maybe there is a factory method on LocalDate you can use to get now
 
 		assertThat(now).isNotNull();
 	}
@@ -109,14 +111,14 @@ public class AboutDateTimeAPI {
 	@Test
 	public void java8_dateInFuture() {
 		LocalDate now = LocalDate.now();
-		LocalDate future = now.plus(1, null); // FIXME: Find out what a ChronoUnit is and what it means.
+		LocalDate future = now.plus(1, ChronoUnit.MONTHS); // FIXED: Find out what a ChronoUnit is and what it means. Adding a month to the current DateTime.
 
 		assertThat(future).isNotNull();
 	}
 
 	@Test
 	public void java8_createSpecificDate() {
-		LocalDate now = null; // FIXME: use the of method to create a date that represents 2000-11-23
+		LocalDate now = LocalDate.of(2000, Month.NOVEMBER, 23); // FIXED: use the of method to create a date that represents 2000-11-23
 
 		assertThat(now.getYear()).isEqualTo(2000);
 		assertThat(now.getMonthValue()).isEqualTo(11); // notice it's not 10 as with Java 7 ;)
@@ -127,9 +129,9 @@ public class AboutDateTimeAPI {
 	public void java8_convertDateToDateTime() {
 		LocalDate now = LocalDate.of(2000, 11, 23);
 
-		// FIXME: A LocalDate does not store hours and minutes. See if you can enhance now with this information. 
+		// FIXED: A LocalDate does not store hours and minutes. See if you can enhance now with this information. 
 		// One hint, take a look at the atTime method.
-		LocalDateTime time = null;
+		LocalDateTime time = now.atTime(14, 14);
 
 		assertThat(time.getHour()).isEqualTo(14);
 		assertThat(time.getMinute()).isEqualTo(14);
@@ -140,12 +142,13 @@ public class AboutDateTimeAPI {
 
 	@Test
 	public void java8_getNowWithSpecificClock() {
-		Clock clock = null; // FIXME: create a clock that start at the epoch and uses the sytem timezone
+		//Since the system's default timezone is Asia/Calcutta(UTC+5:30), the hour and minute assertions were changed accordingly
+		Clock clock = Clock.fixed(Instant.EPOCH, ZoneId.systemDefault()); // FIXED: create a clock that start at the epoch and uses the sytem timezone
 
 		LocalDateTime now = LocalDateTime.now(clock);
 
-		assertThat(now.getHour()).isEqualTo(1);
-		assertThat(now.getMinute()).isEqualTo(0);
+		assertThat(now.getHour()).isEqualTo(5);
+		assertThat(now.getMinute()).isEqualTo(30);
 		assertThat(now.getYear()).isEqualTo(1970);
 		assertThat(now.getMonthValue()).isEqualTo(1);
 		assertThat(now.getDayOfMonth()).isEqualTo(1);
@@ -156,7 +159,7 @@ public class AboutDateTimeAPI {
 		LocalDate now = LocalDate.now();
 		LocalDate future = now.plusDays(1);
 
-		Period period = Period.between(now, null); // FIXME: calculate the period between now and future
+		Period period = Period.between(now, future); // FIXED: calculate the period between now and future
 
 		assertThat(period.getDays()).isEqualTo(1);
 	}
@@ -166,7 +169,7 @@ public class AboutDateTimeAPI {
 		LocalDateTime now = LocalDateTime.now();
 		LocalDateTime future = now.plusMinutes(1);
 
-		Duration duration = Duration.between(null, future); // FIXME: calculate the duration between now and future
+		Duration duration = Duration.between(now, future); // FIXED: calculate the duration between now and future
 
 		assertThat(duration.getSeconds()).isEqualTo(60);
 	}
@@ -176,7 +179,7 @@ public class AboutDateTimeAPI {
 		Duration duration = Duration.ofDays(1);
 		LocalDateTime now = LocalDateTime.now();
 
-		LocalDateTime future = now.plus(null); // FIXME: add the duration to now 
+		LocalDateTime future = now.plus(duration); // FIXED: add the duration to now 
 
 		assertThat(future).isEqualTo(now.plusDays(1));
 	}
@@ -185,7 +188,7 @@ public class AboutDateTimeAPI {
 	public void java8_adjustDatesBySemantic() {
 		LocalDate date = LocalDate.of(2015, 11, 19); // it's a Thursday
 
-		LocalDate saturday = date.with(TemporalAdjusters.next(null)); // FIXME: find out how to get the next Saturday.
+		LocalDate saturday = date.with(TemporalAdjusters.next(DayOfWeek.SATURDAY)); // FIXED: find out how to get the next Saturday.
 
 		assertThat(saturday.getYear()).isEqualTo(2015);
 		assertThat(saturday.getMonthValue()).isEqualTo(11);
@@ -194,15 +197,15 @@ public class AboutDateTimeAPI {
 
 	@Test
 	public void java8_useFixedOffsetsForTimeZones() {
-		// FIXME: I wonder how many hours we need to pass in to have 28800 seconds
-		OffsetDateTime date = OffsetDateTime.of(2000, 11, 23, 14, 14, 14, 14, ZoneOffset.ofHours(-1));
+		// FIXED: I wonder how many hours we need to pass in to have 28800 seconds
+		OffsetDateTime date = OffsetDateTime.of(2000, 11, 23, 14, 14, 14, 14, ZoneOffset.ofHours(28800 / 3600));
 
 		assertThat(date.getOffset().get(ChronoField.OFFSET_SECONDS)).isEqualTo(28800);
 	}
 
 	@Test
 	public void java8_useZoneIdsForTimeZones() {
-		ZonedDateTime berlin = ZonedDateTime.now(ZoneId.of("")); // FIXME: How do we find out the ZoneIf of Berlin?
+		ZonedDateTime berlin = ZonedDateTime.now(ZoneId.of("Europe/Berlin")); // FIXED: How do we find out the ZoneIf of Berlin?
 		ZonedDateTime vancouver = ZonedDateTime.now(ZoneId.of("Canada/Pacific"));
 
 		assertThat(berlin.isBefore(vancouver)).isTrue();

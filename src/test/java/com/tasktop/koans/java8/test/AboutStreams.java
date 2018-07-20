@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -55,8 +56,8 @@ public class AboutStreams {
 	public void java8_filterList() {
 		List<String> list = Lists.newArrayList("a", "b", "a", "b");
 
-		// FIXME: fill in the predicate that filders for "a"
-		List<String> actualList = list.stream().filter(element -> false).collect(Collectors.toList());
+		// FIXED: fill in the predicate that filters for "a"
+		List<String> actualList = list.stream().filter(element -> "a".equals(element)).collect(Collectors.toList());
 
 		assertThat(actualList).isEqualTo(Lists.newArrayList("a", "a"));
 	}
@@ -89,7 +90,8 @@ public class AboutStreams {
 		List<String> actualList = list.stream()
 				.filter(element -> element != null)
 				.filter(element -> element.startsWith("a."))
-				.sorted(null) // FIXME: use string compare to. Think about Method references.
+				//.sorted((element1, element2) -> element1.compareTo(element2))
+				.sorted(String::compareTo) // FIXED: use string compare to. Think about Method references.
 				.collect(Collectors.toList());
 
 		assertThat(actualList).isEqualTo(Lists.newArrayList("a.1", "a.2"));
@@ -111,9 +113,10 @@ public class AboutStreams {
 	public void java8_mapListToOtherType() {
 		List<String> list = Lists.newArrayList("1", "2", "3");
 
-		// FIXME: we need a function that converts Strings to integers. I wonder if a method on Integer could be used
+		// FIXED: we need a function that converts Strings to integers. I wonder if a method on Integer could be used
 		// parsed... I mean used for that.
-		Function<? super String, ? extends Integer> mapper = null;
+		//Function<? super String, ? extends Integer> mapper = t -> Integer.parseInt(t);
+		Function<? super String, ? extends Integer> mapper = Integer::parseInt;
 		List<Integer> actualList = list.stream().map(mapper).collect(Collectors.toList());
 
 		assertThat(actualList).isEqualTo(Lists.newArrayList(1, 2, 3));
@@ -141,8 +144,8 @@ public class AboutStreams {
 	public void java8_findListElement() {
 		List<String> list = Lists.newArrayList("a.2", "b.1", "a.1", "b.2");
 
-		// FIXME: fill in a predicate that filters for "a.1"
-		String result = list.stream().filter(element -> false).findFirst().get();
+		// FIXED: fill in a predicate that filters for "a.1"
+		String result = list.stream().filter(element -> "a.1".equals(element)).findFirst().get();
 
 		assertThat(result).isEqualTo("a.1");
 	}
@@ -163,16 +166,17 @@ public class AboutStreams {
 	public void java8_reduceValues() {
 		List<Integer> list = Lists.newArrayList(1, 1, 1, 1, 1);
 
-		// FIXME: write an accumulator that creates a sum. Remember if a lambda consumes more than one parameter you
+		// FIXED: write an accumulator that creates a sum. Remember if a lambda consumes more than one parameter you
 		// have to use parentheses.
-		Integer sum = list.stream().reduce(null).get();
+		//Integer sum = list.stream().reduce(Integer::sum).get();
+		Integer sum = list.stream().reduce((element1, element2) -> element1 + element2).get();
 
 		assertThat(sum).isEqualTo(5);
 	}
 
 	@Test
 	public void java8_streamsAreNotLimitedToCollections() {
-		String string = null; // FIXME: create a string that can be splitted by "," and has a,b,c as elements.
+		String string = Stream.of("a", "b", "c").collect(Collectors.joining(",")); // FIXED: create a string that can be splitted by "," and has a,b,c as elements.
 
 		List<String> elements = Pattern.compile(",").splitAsStream(string).collect(Collectors.toList());
 

@@ -89,7 +89,7 @@ public class AboutParallelStreams {
 	public void java8_parallelFindMax() {
 		List<Integer> data = Lists.newArrayList(0, 1, 3, 34, 56, 99, 123, 21, 34, 54, 22, 1024);
 
-		int max = -1; // FIXME: take a look at Collection.parallelStream and use it's max method.
+		int max = data.parallelStream().max(Integer::compare).get(); // FIXED: take a look at Collection.parallelStream and use it's max method.
 
 		assertThat(max).isEqualTo(1024);
 	}
